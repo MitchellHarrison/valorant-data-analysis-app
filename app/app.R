@@ -12,6 +12,16 @@ AGENTS <- c("Astra", "Breach", "Brimstone", "Chamber", "Cypher", "Fade",
             "Gekko", "Harbor", "Jett", "KAY/O", "Killjoy", "Neon", "Omen",
             "Phoenix", "Raze", "Reyna", "Sage", "Skye", "Sova", "Viper", "Yoru")
 
+MAPS <- c("Ascent", "Bind", "Breeze", "Fracture", "Haven", "Icebox", "Lotus",
+          "Pearl", "Split")
+
+OUTCOMES <- c("Win", "Loss", "Draw")
+
+RANKS <- c("Iron 1", "Iron 2", "Iron 3", "Bronze 1", "Bronze 2", "Bronze 3",
+           "Silver 1", "Silver 2", "Silver 3", "Gold 1", "Gold 2", "Gold 3",
+           "Platinum 1", "Platinum 2", "Platinum 3", "Diamond 1", "Diamond 2",
+           "Diamond 3", "Ascendant 1", "Ascendant 2", "Ascendant 3", 
+           "Immortal 1", "Immortal 2", "Immortal 3", "Radiant")
 
 # UI --------------------
 ui <- fluidPage(
@@ -20,8 +30,56 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel = sidebarPanel(
-      selectInput("agent_select", "Select an agent:", 
-                  choices = c("All", AGENTS), selected = "All")
+      helpText("Use the following filters to help navigate the data:"),
+      
+      # toggle hiding missing vods
+      checkboxInput("hide_missing_vod_selector", "Hide missing VODs"),
+      
+      # Categorical Selectors -------------------
+      # agent
+      selectInput("agent_select", "Agent:", 
+                  choices = c("All", AGENTS), selected = "All"),
+      
+      # map
+      selectInput("map_select", "Map:",
+                  choices = c("All", MAPS), selected = "All"),
+      
+      # game outcome
+      selectInput("outcome_select", "Outcome:",
+                  choices = c("All", OUTCOMES), selected = "All"),
+      
+      # post-game rank
+      selectInput("rank_select", "Rank:", choices = c("All", RANKS),
+                  selected = "All"),
+      
+      # Range Selectors ------------------
+      # kill count range selector
+      sliderInput("kills_select", "Kills:", min = 0, max = 30,
+                  value = c(0,30)),
+      
+      # death count range selector
+      sliderInput("deaths_select", "Deaths:", min = 0, max = 30,
+                  value = c(0,30)),
+      
+      # assist count range selector
+      sliderInput("assists_select", "Assists:", min = 0, max = 30,
+                  value = c(0,30)),
+      
+      # rounds won range selector
+      sliderInput("roundw_select", "Rounds won:", min = 0, max = 16,
+                  value = c(0,16)),
+      
+      # rounds lost range selector
+      sliderInput("roundl_select", "Rounds lost:", min = 0, max = 16,
+                  value = c(0,16)),
+      
+      # frag range selector
+      sliderInput("nfrag_select", "Frag:", min = 1, max = 5, value = c(1,5)),
+      
+      # date range selector
+      dateRangeInput("date_selector", "Date:", start = "2023-01-01", 
+                     end = "2023-05-31", min = "2023-01-01", 
+                     max = "2023-05-31")
     ),
     
     mainPanel = mainPanel(
@@ -35,12 +93,41 @@ ui <- fluidPage(
 server <- function(input, output){
   ranked_data <- reactive({read_sheet(DATA_URL)})
   
+  # render the filtered data table
   output$table <- renderDataTable({
-    if (input$agent_select == "All") {
-      ranked_data()
-    } else {
-      ranked_data() |> filter(agent == input$agent_select)
-    }
+    val <- ranked_data()
+    
+    # filters
+    agent_select <- input$agent_select
+    map_select <- input$map_select
+    outcome_select <- input$outcome_select
+    rank_select <- input$rank_select
+    roundsw_min <- input$roundw_select[1]
+    roundsw_max <- input$roundw_select[2]
+    roundsl_min <- input$roundl_select[1]
+    roundsl_max <- input$roundl_select[2]
+    date_min <- input$date_selector[1]
+    date_max <- input$date_selector[2]
+    
+    # apply filters
+    val |>
+      filter(
+        case_when(
+          agent_select != "All" ~ agent == agent_select,
+          map_select != "All" ~ map == map_select,
+          outcome_select != "All" ~ outcome == outcome_select,
+          rank_select != "All" ~ rank_after_match == rank_select,
+          input$hide_missing_vod_selector ~ !is.na(vod),
+          TRUE ~ rank_after_match %in% RANKS
+        ),
+        kills <= input$kills_select[2] & kills >= input$kills_select[1],
+        deaths <= input$deaths_select[2] & deaths >= input$deaths_select[1],
+        assists <= input$assists_select[2] & assists >= input$assists_select[1],
+        round_wins <= roundsw_max & round_wins >= roundsw_min,
+        round_losses <= roundsl_max & round_losses >= roundsl_min,
+        num_frag <= input$nfrag_select[2] & num_frag >= input$nfrag_select[1],
+        date <= date_max & date >= date_min
+      )
   })
 }
 
