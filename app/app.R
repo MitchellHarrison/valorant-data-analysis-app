@@ -29,102 +29,113 @@ ui <- fluidPage(
   titlePanel(h1("Valorant Explorer")),
   
   sidebarLayout(
-    sidebarPanel = sidebarPanel(
-      helpText("Use the following filters to help navigate the data."),
+    sidebarPanel = sidebarPanel(width = 3,
+      selectInput("module_select", "Select module:",
+                  choices = c("Data Table Explorer", "Page 2"),
+                  selected = "Data Table Explorer"),
       
-      # checkboxes to toggle which data table filters are visible
-      checkboxGroupInput("dt_filters_select", "Choose your filters:",
-                         choices = c("Agent", "Map", "Game outcome", 
-                                     "Post-game rank", "Kills", "Deaths", 
-                                     "Assists", "Rounds won", "Rounds lost", 
-                                     "Frag", "Date"),
-                         inline = T),
-      
-      # toggle hiding missing vods
-      checkboxInput("hide_missing_vod_selector", "Hide missing VODs"),
-      
-      # Data Table Categorical Selectors -------------------
-      # agent
+      # Data Table Explorer Module -----------------
       conditionalPanel(
-        condition = "input.dt_filters_select.includes('Agent')",
-        selectInput("agent_select", "Agent:", 
-                    choices = c("All", AGENTS), selected = "All"),
-      ),
-      
-      # map
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Map')",
-        selectInput("map_select", "Map:",
-                    choices = c("All", MAPS), selected = "All"),
-      ),
-      
-      # game outcome
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Game outcome')",
-        selectInput("outcome_select", "Outcome:",
-                    choices = c("All", OUTCOMES), selected = "All")
-      ),
-      
-      # post-game rank
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Post-game rank')",
-        selectInput("rank_select", "Rank:", choices = c("All", RANKS),
-                    selected = "All")
-      ),
-      
-      # Data Table Range Selectors ------------------
-      # kill count range selector
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Kills')",
-        sliderInput("kills_select", "Kills:", min = 0, max = 30,
-                    value = c(0,30))
-      ),
-      
-      # death count range selector
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Deaths')",
-        sliderInput("deaths_select", "Deaths:", min = 0, max = 30,
-                    value = c(0,30))
-      ),
-      
-      # assist count range selector
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Assists')",
-        sliderInput("assists_select", "Assists:", min = 0, max = 30,
-                    value = c(0,30))
-      ),
-      
-      # rounds won range selector
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Rounds won')",
-        sliderInput("roundw_select", "Rounds won:", min = 0, max = 16,
-                    value = c(0,16))
-      ),
-      
-      # rounds lost range selector
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Rounds lost')",
-        sliderInput("roundl_select", "Rounds lost:", min = 0, max = 16,
-                    value = c(0,16))
-      ),
-      
-      # frag range selector
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Frag')",
-        sliderInput("nfrag_select", "Frag:", min = 1, max = 5, value = c(1,5))
-      ),
-      
-      # date range selector
-      conditionalPanel(
-        condition = "input.dt_filters_select.includes('Date')",
-        dateRangeInput("date_selector", "Date:", start = "2023-01-01", 
-                       end = "2023-05-31", min = "2023-01-01", 
-                       max = "2023-05-31")
+        condition = "input.module_select == 'Data Table Explorer'",
+        helpText("Use the following filters to help navigate the data."),
+        
+        # checkboxes to toggle which data table filters are visible
+        checkboxGroupInput("dt_filters_select", "Choose your filters:",
+                           choices = c("Agent", "Map", "Game outcome", 
+                                       "Post-game rank", "Kills", "Deaths", 
+                                       "Assists", "Rounds won", "Rounds lost", 
+                                       "Frag", "Date"),
+                           inline = T),
+        
+        # toggle hiding missing vods
+        checkboxInput("hide_missing_vod_selector", "Hide missing VODs"),
+        
+        # Data Table Categorical Selectors -------------------
+        # agent
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Agent')",
+          selectInput("agent_select", "Agent:", 
+                      choices = c("All", AGENTS), selected = "All"),
+        ),
+        
+        # map
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Map')",
+          selectInput("map_select", "Map:",
+                      choices = c("All", MAPS), selected = "All"),
+        ),
+        
+        # game outcome
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Game outcome')",
+          selectInput("outcome_select", "Outcome:",
+                      choices = c("All", OUTCOMES), selected = "All")
+        ),
+        
+        # post-game rank
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Post-game rank')",
+          selectInput("rank_select", "Rank:", choices = c("All", RANKS),
+                      selected = "All")
+        ),
+        
+        # Data Table Range Selectors ------------------
+        # kill count range selector
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Kills')",
+          sliderInput("kills_select", "Kills:", min = 0, max = 30,
+                      value = c(0,30))
+        ),
+        
+        # death count range selector
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Deaths')",
+          sliderInput("deaths_select", "Deaths:", min = 0, max = 30,
+                      value = c(0,30))
+        ),
+        
+        # assist count range selector
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Assists')",
+          sliderInput("assists_select", "Assists:", min = 0, max = 30,
+                      value = c(0,30))
+        ),
+        
+        # rounds won range selector
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Rounds won')",
+          sliderInput("roundw_select", "Rounds won:", min = 0, max = 16,
+                      value = c(0,16))
+        ),
+        
+        # rounds lost range selector
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Rounds lost')",
+          sliderInput("roundl_select", "Rounds lost:", min = 0, max = 16,
+                      value = c(0,16))
+        ),
+        
+        # frag range selector
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Frag')",
+          sliderInput("nfrag_select", "Frag:", min = 1, max = 5, value = c(1,5))
+        ),
+        
+        # date range selector
+        conditionalPanel(
+          condition = "input.dt_filters_select.includes('Date')",
+          dateRangeInput("date_selector", "Date:", start = "2023-01-01", 
+                         end = "2023-05-31", min = "2023-01-01", 
+                         max = "2023-05-31")
+        )
       )
     ),
     
     mainPanel = mainPanel(
-      dataTableOutput("table")
+      conditionalPanel(
+        condition = "input.module_select == 'Data Table Explorer'",
+        dataTableOutput("table")
+      )
     )
   )
 )
