@@ -31,13 +31,12 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel = sidebarPanel(width = 3,
       selectInput("module_select", "Select module:",
-                  choices = c("Data Table Explorer", "Page 2"),
+                  choices = c("Data Table Explorer", "Agent Analysis"),
                   selected = "Data Table Explorer"),
       
       # Data Table Explorer Module -----------------
       conditionalPanel(
         condition = "input.module_select == 'Data Table Explorer'",
-        helpText("Use the following filters to help navigate the data."),
         
         # checkboxes to toggle which data table filters are visible
         checkboxGroupInput("dt_filters_select", "Choose your filters:",
@@ -128,13 +127,27 @@ ui <- fluidPage(
                          end = "2023-05-31", min = "2023-01-01", 
                          max = "2023-05-31")
         )
+      ),
+      
+      # Agent Module ----------------
+      conditionalPanel(
+        condition = "input.module_select == 'Agent Analysis'",
+        selectInput("agent_select_agent", "Agent:", choices = AGENTS,
+                    selected = "Astra")
       )
     ),
     
     mainPanel = mainPanel(
+      # Data Table Module -----------------
       conditionalPanel(
         condition = "input.module_select == 'Data Table Explorer'",
         dataTableOutput("table")
+      ),
+      
+      # Agent Module ----------------
+      conditionalPanel(
+        condition = "input.module_select == 'Agent Analysis'",
+        uiOutput(outputId = "agent_module_agent_image")
       )
     )
   )
@@ -180,6 +193,13 @@ server <- function(input, output){
         num_frag <= input$nfrag_select[2] & num_frag >= input$nfrag_select[1],
         date <= date_max & date >= date_min
       )
+  })
+  
+  # render agent image in agent module
+  output$agent_module_agent_image <- renderUI({
+    img(src = paste("agents/", str_replace(input$agent_select_agent, "/", ""), 
+                    ".png", sep = ""),
+        height = 400)
   })
 }
 
