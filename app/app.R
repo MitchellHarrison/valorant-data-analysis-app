@@ -30,56 +30,97 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel = sidebarPanel(
-      helpText("Use the following filters to help navigate the data:"),
+      helpText("Use the following filters to help navigate the data."),
+      
+      # checkboxes to toggle which data table filters are visible
+      checkboxGroupInput("dt_filters_select", "Choose your filters:",
+                         choices = c("Agent", "Map", "Game outcome", 
+                                     "Post-game rank", "Kills", "Deaths", 
+                                     "Assists", "Rounds won", "Rounds lost", 
+                                     "Frag", "Date"),
+                         inline = T),
       
       # toggle hiding missing vods
       checkboxInput("hide_missing_vod_selector", "Hide missing VODs"),
       
-      # Categorical Selectors -------------------
+      # Data Table Categorical Selectors -------------------
       # agent
-      selectInput("agent_select", "Agent:", 
-                  choices = c("All", AGENTS), selected = "All"),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Agent')",
+        selectInput("agent_select", "Agent:", 
+                    choices = c("All", AGENTS), selected = "All"),
+      ),
       
       # map
-      selectInput("map_select", "Map:",
-                  choices = c("All", MAPS), selected = "All"),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Map')",
+        selectInput("map_select", "Map:",
+                    choices = c("All", MAPS), selected = "All"),
+      ),
       
       # game outcome
-      selectInput("outcome_select", "Outcome:",
-                  choices = c("All", OUTCOMES), selected = "All"),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Game outcome')",
+        selectInput("outcome_select", "Outcome:",
+                    choices = c("All", OUTCOMES), selected = "All")
+      ),
       
       # post-game rank
-      selectInput("rank_select", "Rank:", choices = c("All", RANKS),
-                  selected = "All"),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Post-game rank')",
+        selectInput("rank_select", "Rank:", choices = c("All", RANKS),
+                    selected = "All")
+      ),
       
-      # Range Selectors ------------------
+      # Data Table Range Selectors ------------------
       # kill count range selector
-      sliderInput("kills_select", "Kills:", min = 0, max = 30,
-                  value = c(0,30)),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Kills')",
+        sliderInput("kills_select", "Kills:", min = 0, max = 30,
+                    value = c(0,30))
+      ),
       
       # death count range selector
-      sliderInput("deaths_select", "Deaths:", min = 0, max = 30,
-                  value = c(0,30)),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Deaths')",
+        sliderInput("deaths_select", "Deaths:", min = 0, max = 30,
+                    value = c(0,30))
+      ),
       
       # assist count range selector
-      sliderInput("assists_select", "Assists:", min = 0, max = 30,
-                  value = c(0,30)),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Assists')",
+        sliderInput("assists_select", "Assists:", min = 0, max = 30,
+                    value = c(0,30))
+      ),
       
       # rounds won range selector
-      sliderInput("roundw_select", "Rounds won:", min = 0, max = 16,
-                  value = c(0,16)),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Rounds won')",
+        sliderInput("roundw_select", "Rounds won:", min = 0, max = 16,
+                    value = c(0,16))
+      ),
       
       # rounds lost range selector
-      sliderInput("roundl_select", "Rounds lost:", min = 0, max = 16,
-                  value = c(0,16)),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Rounds lost')",
+        sliderInput("roundl_select", "Rounds lost:", min = 0, max = 16,
+                    value = c(0,16))
+      ),
       
       # frag range selector
-      sliderInput("nfrag_select", "Frag:", min = 1, max = 5, value = c(1,5)),
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Frag')",
+        sliderInput("nfrag_select", "Frag:", min = 1, max = 5, value = c(1,5))
+      ),
       
       # date range selector
-      dateRangeInput("date_selector", "Date:", start = "2023-01-01", 
-                     end = "2023-05-31", min = "2023-01-01", 
-                     max = "2023-05-31")
+      conditionalPanel(
+        condition = "input.dt_filters_select.includes('Date')",
+        dateRangeInput("date_selector", "Date:", start = "2023-01-01", 
+                       end = "2023-05-31", min = "2023-01-01", 
+                       max = "2023-05-31")
+      )
     ),
     
     mainPanel = mainPanel(
